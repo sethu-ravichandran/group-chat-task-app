@@ -5,7 +5,7 @@ const { login, logout } = require('../controllers/authController')
 const validate = require('../middleware/validate')
 const {check} = require('express-validator')
 const {verify, verifyAdmin} = require('../middleware/verify')
-const {authenticateAdmin, createUser} = require('../controllers/adminController')
+const {authenticateAdmin, createUser, updateUser} = require('../controllers/adminController')
 
 router.post(
     '/login',
@@ -41,6 +41,31 @@ router.post('/createUser',verify, verifyAdmin,
         .withMessage('Password length is atleast 8 characters'),
     validate,
     createUser
+)
+
+router.post('/editUser',verify, verifyAdmin,
+    check('email')
+        .isEmail()
+        .withMessage('Enter a valid email address')
+        .normalizeEmail(),
+    check('firstName')
+        .not()
+        .isEmpty()
+        .withMessage('First name is a mandatory field')
+        .trim()
+        .escape(),
+    check('lastName')
+        .not()
+        .isEmpty()
+        .withMessage('Last name is a mandatory field')
+        .trim()
+        .escape(),
+    check('password')
+        .notEmpty()
+        .isLength({ min: 8 })
+        .withMessage('Password length is atleast 8 characters'),
+    validate,
+    updateUser
 )
 
 router.get('/authenticate', verify, verifyAdmin, authenticateAdmin)
